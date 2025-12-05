@@ -1,0 +1,32 @@
+  version: '3.8'
+  services:
+    web:
+      image: 'nginx'
+      deploy:
+        replicas: 2
+      ports:
+        - '8080:80'
+      container_name: 'my-nginx-container'
+      networks:
+        - 'mynet1'
+      volumes:
+        - 'my_nginx_data:/usr/share/nginx/html'
+    db:
+      image: 'postgre:latest'
+      container_name: 'my-postgres-container'
+      deploy:
+        replicas: 3
+      ports:
+        - '5432:5432'
+      networks:
+        - 'mynet2'
+      volumes:
+        - 'my_postgres_data:/var/lib/postgresql/data'
+  networks:
+    mynet1:
+      driver: bridge
+    mynet2:
+      driver: bridge
+  volumes:
+    my_nginx_data:
+    my_postgres_data: 
