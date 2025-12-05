@@ -1,0 +1,66 @@
+-----Work Process for building a Docker image for a Java application using Maven and OpenJDK
+# Firstly clone the repository in gcloud shell
+# then git clone "url of repository"
+# then cd into the directory
+# run the command mvn package to build the jar file
+# copy this jar file in  one gcs bucket and  and grant access to all users to use this jar file object.
+gsutil cp target/spring-petclinic-3.5.0-SNAPSHOT.jar  gs://bucket1project1-466607/
+ # create one directory and switch to that directory and download the jarfile
+   #using wget command by taking the url from the google bucket.
+#create a dockerfile with the following content
+#build the docker image.
+
+
+
+# Step 1: Take the base image as ubuntu:18.04
+FROM ubuntu:22.04
+
+# Step 2 : Add the metadata to the image
+LABEL maintainer="chandu@example.com"
+LABEL version="1.0"
+LABEL description="A simple Java application using OpenJDK 17"
+
+# Step 3: Build time variable
+ARG version=1.0
+
+# Step 4: Set environment variables
+ENV APP_HOME=/app
+ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+ENV NAME=chandu
+
+# Step 5: Set the working directory
+WORKDIR $APP_HOME
+
+# Step 6: Update package lists
+RUN apt update && apt install openjdk-21-jdk wget -y
+
+#Step 7: Download the application JAR file
+RUN wget "https://storage.googleapis.com/my-java-artifact-bucket/spring-petclinic-3.5.0-SNAPSHOT.jar"
+
+
+# Step 8: Add the user to run the application
+RUN useradd -ms /bin/bash $NAME
+
+# Step 9: Switch to the non-root user
+USER $NAME
+
+# Step 10: Expose the Application
+EXPOSE 8080
+
+# Step 11: Command to run the application
+CMD ["java", "-jar", "spring-petclinic-3.5.0-SNAPSHOT.jar"]
+
+
+# run this command to build the docker image
+docker build -t spring:ubuntu .
+# run this command to run the docker image
+docker run -dit  --name petclinic  -P spring:ubuntu
+# run this command to check the running container
+docker ps
+# run this command to check the logs of the container               
+docker logs petclinic
+
+
+# This Dockerfile creates a Java Spring Pet Clinic application container.
+# It installs the necessary dependencies, adds a non-root user, and sets the working directory.
+# Finally, it exposes the application port and defines the command to run the application.

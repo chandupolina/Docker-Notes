@@ -1,0 +1,179 @@
+
+-------------------------------------------------------------------------------------------------------------------
+
+
+
+-------------------------------------------------------------------------------------------------------------
+
+
+1) create a container with apache webserver installed 
+verify the homepath of the webserver inside the container.
+/var/www/html/index.html
+
+docker pull httpd
+# run this command to run the docker image
+docker run -dit --name apachewebserver  -p 8080:80 httpd
+# run this command to check the running container
+docker ps
+# run this command to check the logs of the container
+docker logs apachewebserver
+# copy the public ip address of the container and paste it in the browser along with the port number 8080
+http://<public-ip>:8080/
+# now the apache webserver is running in the container and you can see the default page of apache webserver.
+# run docker image inspect command to check the workdir  of the webserver inside the container.
+docker image inspect httpd and check for "WorkingDir" in the output.
+# Apache by default serves files from: /usr/local/apache2/htdocs/
+# This is Apache's equivalent to /var/www/html used in Linux distributions like Ubuntu/Debian.
+
+--------------------------------------------------------------------------------------------------------------
+
+  2)During container creation:
+The host machine has a custom index.html.
+You want the container’s nginx to serve that custom file.
+And ensure it’s accessible externally (via browser or curl).
+Use port publishing: -p hostport:containerport.
+
+# create a project directory and switch to that directory
+mkdir apache-webserver
+cd apache-webserver 
+# create a custom index.html file
+echo "<h1> Welcome to my custom Apache web server!</h1>" > index.html
+# create a Dockerfile with the following content
+vi Dockerfile
+FROM nginx
+copy index.html /var/www/html/index.html
+# build the docker image
+docker build  -t nginx:v1 .
+# run the docker image
+docker run -dit  --name custom-nginx -p 8080:80 nginx:v1
+# check the running container
+docker ps
+# check the logs of the container
+docker logs custom-nginx    
+# copy the public ip address of the container and paste it in the browser along with the port number 8080
+http://<public-ip>:8080/        
+# you should see the custom index.html file content in the browser.
+# run docker image inspect command to check the workdir of the webserver inside the container.
+docker image inspect nginx and check for "WorkingDir" in the output.    
+# nginx will provide the default path as /var/www/html
+# This is the default directory where nginx serves files from.
+
+----------------------------------------------------------------------------------------------------------------- 
+
+TAsk 3:
+
+Create a Dockerfile that:
+Installs Nginx
+Exposes a port
+Uses a custom HTML file
+Copies it to Nginxs root directory
+Starts the Nginx process from a script.sh
+
+# create a project directory and switch to that directory
+mkdir nginx-webserver
+cd nginx-webserver  
+
+# create a custom index.html file
+echo "<h1>Welcome to my custom Nginx web server!</h1>" > index.html
+
+# create a script.sh file to start the nginx process
+echo #!/bin/bash
+nginx -g "daemon off;">script.sh
+# make the script executable
+chmod +x script.sh
+
+# create a Dockerfile with the following content
+vi Dockerfile
+FROM ubuntu:20.04
+RUN apt-get update && apt-get install nginx -y
+COPY index.html /usr/share/nginx/html/index.html
+COPY script.sh /root/script.sh
+EXPOSE 80
+ENTRYPOINT ["/root/script.sh"]
+
+# build the docker image
+docker build -t custom-nginx:v1 . 
+
+# run the docker image
+docker run -dit --name custom-nginx -p 8080:80 custom-nginx:v1
+
+# check the running container
+docker ps
+
+# check the logs of the container
+docker logs custom-Nginx
+
+# copy the public ip address of the container and paste it in the browser along with the port number 8080
+http://<public-ip>:8080/
+
+# you should see the custom index.html file content in the browser.
+
+--------------------------------------------------------------------------------------------------------------
+
+  Task 4:
+Create a Java application
+Use a slim base image like openjdk:17-slim
+Build a Docker image with a Dockerfile
+Run the container to execute the app
+
+What is slim?
+slim images are smaller versions of the standard images designed to reduce the size of the image by removing unnecessary files and dependencies.
+For Java, openjdk:17-slim is a lightweight version of openjdk17.
+
+---------------------------------------------------------------------------------------------------------------
+
+
+  Task 5:
+    create a python application
+    Use a slim base image like python:3.9-slim    
+    Build a Docker image with a Dockerfile
+    Run the container to execute the app  
+# Projeect structure:
+  python-app/
+├── app.py
+├── requirements.txt
+└── Dockerfile  
+# create a project directory and switch to that directory
+mkdir python-app    
+cd python-app
+# create a app.py file with the following content
+vi app.py
+# paste the following content in app.py
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return " Hello from Sai Chandu's Flask App in Docker!"
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+
+# create a requirements.txt file with the following content
+vi requirements.txt
+#paste the following content in requirements.txt
+flask
+# create a Dockerfile with the following content
+vi Dockerfile
+# paste the following content in Dockerfile
+FROM python:3.9-slim
+WORKDIR /app
+COPY . .
+RUN pip install -r requirements.txt
+EXPOSE 5000
+# use the command below to run the flask app
+CMD ["python", "app.py"]
+
+# build the docker image
+docker build -t python-app:v1 .
+# run the docker image
+docker run -dit --name python-app -p 5000:5000 python-app:v1
+# check the running container
+docker ps
+# check the logs of the container
+docker logs python-app
+# copy the public ip address of the container and paste it in the browser along with the port number 5000
+http://<public-ip>:5000/
+# you should see the message "Hello from Sai Chandu's Flask App in Docker!" in the browser.
+
+---------------------------------------------------------------------------------

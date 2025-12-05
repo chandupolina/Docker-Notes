@@ -1,0 +1,17 @@
+rebuild  or create other image:
+# create a dockerfile with the following content
+# vi file1
+
+FROM openjdk:17 
+ADD https://storage.googleapis.com/sai1123/spring-petclinic-3.5.0-SNAPSHOT.jar  /spring-petclinic.jar
+EXPOSE 8080     
+CMD ["java", "-jar", "/spring-petclinic.jar"]
+
+# run this command to build the docker image
+docker  build -t spring:openjdk17  -f file1 .
+# run this command to run the docker image
+docker run -dit --name springpetclinic -P spring:openjdk17
+# run this command to check the running container
+docker ps
+# run this command to check the logs of the container
+docker logs springpetclinic

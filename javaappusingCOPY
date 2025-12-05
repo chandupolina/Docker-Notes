@@ -1,0 +1,8 @@
+FROM openjdk:21
+ENV APP_HOME /app
+WORKDIR $APP_HOME
+COPY /target/spring-petclinic-3.5.0-SNAPSHOT.jar  .
+RUN useradd -ms /bin/bash chandu
+USER chandu
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "spring-petclinic-3.5.0-SNAPSHOT.jar"]

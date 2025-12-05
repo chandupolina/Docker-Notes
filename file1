@@ -1,0 +1,21 @@
+# i want to create a Dockerfile that uses a base image of openjdk:17-jdk
+# please give me end to end Dockerfile code AFTER CREATING A JAR FILE FROM A JAVA APPLICATION
+# please ensure the Dockerfile is complete and functional with each and every instruction explained
+# the Dockerfile should be able to build a Java application
+FROM openjdk:17-jdk
+WORKDIR /app
+# Copy the JAR file into the container
+COPY target/myapp.jar myapp.jar 
+# Expose the port on which the application will run
+EXPOSE 8080
+# Command to run the JAR file
+CMD ["java", "-jar", "myapp.jar"]
+# This Dockerfile uses the OpenJDK 17 JDK base image to create a container for a Java application.
+# It sets the working directory to /app, copies the JAR file from the target directory  
+
+
+FROM openjdk:17-jdk
+WORKDIR /app
+COPY target/spring-petclinic-3.5.0-SNAPSHOT.jar  .
+EXPOSE 8080
+CMD ["java", "-jar", "spring-petclinic-3.5.0-SNAPSHOT.jar"]

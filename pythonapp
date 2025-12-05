@@ -1,0 +1,79 @@
+#python based application Dockerfile
+
+  python-app/
+├── app.py
+├── requirements.txt
+└── Dockerfile  
+# create a project directory and switch to that directory
+mkdir python-app    
+cd python-app
+# create a app.py file with the following content
+vi app.py
+
+# paste the following content in app.py
+import os
+from flask import Flask, render_template
+server = Flask(__name__)
+
+@server.route("/")
+def welcome():
+    return render_template("webpage.html")
+
+@server.route('/openshift')
+def hello():
+    return 'Openshift is easy to learn'
+
+if __name__ == "__main__":
+    server.run(host="0.0.0.0", port=8080)
+
+# create a requirements.txt file with the following content
+vi requirements.txt
+#paste the following content in requirements.txt
+Flask==1.1.1
+
+clone the 
+# step 1: take the base image as python:3.9-slim
+FROM ubuntu:20.04
+
+# step 2: Add metadata to the image
+LABEL maintainer="chandu@example.com"
+LABEL version="1.0"
+LABEL description="A simple Python Flask application"
+
+# step 3: Build time variable
+ARG version=1.0
+
+# step 4: set the environment variables
+ENV FLASK_ENV=production
+ENV APP_HOME=/app
+
+# step 5: set the working directory to /app
+WORKDIR $APP_HOME
+
+
+# step 6 : Copy the requirements file into the container
+COPY requirements.txt .
+
+
+# step 7: Install the dependencies
+RUN apt-get update && apt-get install -y python python-pip
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+# step 8 : add user to run the application
+# -m creates the home directory
+# -s sets the default shell to /bin/bash in container.
+RUN useradd -ms /bin/bash chandu
+
+# step 9: Switch to the new user
+USER chandu
+
+# step 10: Copy the application code into the container
+COPY . .
+# step 11: Expose the port on which the application will run
+EXPOSE 8080
+# step 12: Command to run the application
+CMD ["python", "app.py"]
+# This Dockerfile creates a lightweight Python Flask application container.
+# It installs the necessary dependencies, adds a non-root user, and sets the working directory.
+# Finally, it exposes the application port and defines the command to run the application.
